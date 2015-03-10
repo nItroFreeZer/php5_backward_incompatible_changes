@@ -1,0 +1,168 @@
+#!/bin/bash
+#
+# Searches for changed, deprecated and removed PHP 5 functions and ini directives
+#
+# Version: 0.1 (2015-03-10)
+#
+
+SEARCHLOCATION="*"
+LOGLOCATION="/tmp/php5_backward_incompatible_changes.log"
+OUTPUT=${LOGLOCATION}
+
+deprecatedFunctions=(
+# php 5.4
+    mcrypt_generic_end
+    mysql_list_dbs
+# php 5.5
+    mysql_affected_rows
+    mysql_client_encoding
+    mysql_close
+    mysql_connect
+    mysql_create_db
+    mysql_data_seek
+    mysql_db_name
+    mysql_db_query
+    mysql_drop_db
+    mysql_errno
+    mysql_error
+    mysql_escape_string
+    mysql_fetch_array
+    mysql_fetch_assoc
+    mysql_fetch_field
+    mysql_fetch_lengths
+    mysql_fetch_object
+    mysql_fetch_row
+    mysql_field_flags
+    mysql_field_len
+    mysql_field_name
+    mysql_field_seek
+    mysql_field_table
+    mysql_field_type
+    mysql_free_result
+    mysql_get_client_info
+    mysql_get_host_info
+    mysql_get_proto_info
+    mysql_get_server_info
+    mysql_info
+    mysql_insert_id
+    mysql_list_dbs
+    mysql_list_fields
+    mysql_list_processes
+    mysql_list_tables
+    mysql_num_fields
+    mysql_num_rows
+    mysql_pconnect
+    mysql_ping
+    mysql_query
+    mysql_real_escape_string
+    mysql_result
+    mysql_select_db
+    mysql_set_charset
+    mysql_stat
+    mysql_tablename
+    mysql_thread_id
+    mysql_unbuffered_query
+    IntlDateFormatter::setTimeZoneID
+    datefmt_set_timezone_id
+    mcrypt_cbc
+    mcrypt_cfb
+    mcrypt_ecb
+    mcrypt_ofb
+)
+
+removedFunctions=(
+# php 5.4
+    define_syslog_variables
+    import_request_variables
+    session_is_registered
+    session_register
+    session_unregister
+    mysqli_bind_param
+    mysqli_bind_result
+    mysqli_client_encoding
+    mysqli_fetch
+    mysqli_param_count
+    mysqli_get_metadata
+    mysqli_send_long_data
+    mysqli::client_encoding
+    mysqli_stmt::stmt
+# php 5.5
+    php_logo_guid
+    php_egg_logo_guid
+    php_real_logo_guid
+    zend_logo_guid
+)
+
+changedFunctions=(
+# php 5.4
+    get_magic_quotes_gpc
+    get_magic_quotes_runtime
+    set_magic_quotes_runtime
+    array_combine
+    htmlspecialchars
+    htmlentities
+    ob_start
+# php 5.5
+    pack
+    unpack
+    preg_replace
+# php 5.6
+    json_decode
+
+)
+
+criticalIniDirectives=(
+# php 5.4
+    register_globals
+    register_long_arrays
+#php 5.6
+    always_populate_raw_post_data
+)
+
+echo "" >> ${OUTPUT}
+echo "Checking for deprecated functions ---------------------------------------------" >> ${OUTPUT}
+l=${#deprecatedFunctions[*]}
+i=0
+while [ $i -lt $l ]; do
+    echo " --- ${deprecatedFunctions[$i]}()" >> ${OUTPUT}
+    grep -n --color --include=.php  "^[^#]*${deprecatedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    grep -rn --color --include=*.php  "^[^#]*${deprecatedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    echo ""  >> ${OUTPUT}
+    let i++
+done
+
+echo "" >> ${OUTPUT}
+echo "Checking for removed functions ------------------------------------------------" >> ${OUTPUT}
+l=${#removedFunctions[*]}
+i=0
+while [ $i -lt $l ]; do
+    echo " --- ${removedFunctions[$i]}()" >> ${OUTPUT}
+    grep -n --color --include=.php  "^[^#]*${removedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    grep -rn --color --include=*.php  "^[^#]*${removedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    echo ""  >> ${OUTPUT}
+    let i++
+done
+
+echo "" >> ${OUTPUT}
+echo "Checking for changed functions ------------------------------------------------" >> ${OUTPUT}
+l=${#changedFunctions[*]}
+i=0
+while [ $i -lt $l ]; do
+    echo " --- ${changedFunctions[$i]}()" >> ${OUTPUT}
+    grep -n --color --include=.php  "^[^#]*${changedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    grep -rn --color --include=*.php  "^[^#]*${changedFunctions[$i]}[[:space:]]*(" ${SEARCHLOCATION} >> ${OUTPUT};
+    echo ""  >> ${OUTPUT}
+    let i++
+done
+
+echo "" >> ${OUTPUT}
+echo "Checking for changed or deprecated or removed ini directives ------------------"  >> ${OUTPUT}
+l=${#criticalIniDirectives[*]}
+i=0
+while [ $i -lt $l ]; do
+    echo " --- ${criticalIniDirectives[$i]}()" >> ${OUTPUT}
+    grep -n --color --include=.php  "ini_set[[:space:]]*(['|\"]${criticalIniDirectives[$i]}" ${SEARCHLOCATION} >> ${OUTPUT};
+    grep -rn --color --include=*.php  "ini_set[[:space:]]*(['|\"]${criticalIniDirectives[$i]}" ${SEARCHLOCATION} >> ${OUTPUT};
+    echo "" >> ${OUTPUT}
+    let i++
+done
