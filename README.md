@@ -1,6 +1,6 @@
-# PHP5 Backward Incompatible Changes
+# PHP Backward Incompatible Changes
 
-Searches for changed, deprecated and removed PHP 5 functions and ini directives.
+Searches for changed, deprecated and removed PHP functions and ini directives.
 Supports changes from PHP 5.3.x to PHP 7.0.x.
 
 Please read the official migration guides:

@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# Searches for changed, deprecated and removed PHP 5 functions and ini directives
+# Searches for changed, deprecated and removed PHP functions and ini directives
 #
 # Version: 0.2 (2015-12-09)
 #
 
 SEARCHLOCATION="*"
-LOGLOCATION="/tmp/php5_backward_incompatible_changes.log"
+LOGLOCATION="/tmp/php_backward_incompatible_changes.log"
 OUTPUT=${LOGLOCATION}
 
 deprecatedFunctions=(
@@ -250,7 +250,6 @@ changedFunctions=(
     setlocale
     list
     foreach
-
 )
 
 criticalIniDirectives=(
